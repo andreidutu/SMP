@@ -1,10 +1,7 @@
-
-name "mouse"
-
 org 100h
-
+;Macro print cu 4 parametrii
 print macro x, y, attrib, sdat
-LOCAL   s_dcl, skip_dcl, s_dcl_end
+LOCAL   s_dcl, skip_dcl, s_dcl_end ; folosim local pentru a nu avea erori in cod de tipul duplicat
     pusha
     mov dx, cs
     mov es, dx
@@ -13,48 +10,48 @@ LOCAL   s_dcl, skip_dcl, s_dcl_end
     mov bh, 0
     mov bl, attrib
     mov cx, offset s_dcl_end - offset s_dcl
-    mov dl, x
-    mov dh, y
+    mov dl, x ; pune in dl valoarea lui X
+    mov dh, y ; pune in dh valoarea lui y
     mov bp, offset s_dcl
-    int 10h
+    int 10h ; apel de rutina
     popa
-    jmp skip_dcl
-    s_dcl DB sdat
-    s_dcl_end DB 0
+    jmp skip_dcl ; jump la sfarsit pentru a iesii din macro
+    s_dcl DB sdat ; declarare variabila
+    s_dcl_end DB 0 ; declarare variabila
     skip_dcl:    
 endm
 
-clear_screen macro
-    pusha
+curatare_ecran macro
+    pusha ; face push in coada in ordinea asta AX CX DX BX SP BP SI DI
     mov ax, 0600h
     mov bh, 0000_1111b
-    mov cx, 0
-    mov dh, 24
-    mov dl, 79
-    int 10h
-    popa
+    mov cx, 0 ; iteratorul
+    mov dh, 24 ; rand
+    mov dl, 79 ; coloana
+    int 10h ; apel de rutina
+    popa ; reverse la push a in ordine inversa
 endm
 
 print_space macro num
-    pusha
+    pusha ; face push in coada in ordinea asta AX CX DX BX SP BP SI DI
     mov ah, 9
     mov al, ' '
     mov bl, 0000_1111b
     mov cx, num
-    int 10h
-    popa
+    int 10h ; apel de rutina
+    popa ; reverse la push a in ordine inversa
 endm
 
 
 jmp start
 
-curX dw 0
-curY dw 0
-curB dw 0
+curX dw 0 ; declarare
+curY dw 0 ; declarare
+curB dw 0 ; declarare
 
 
 start:
-mov ax, 1003h ; disable blinking.  
+mov ax, 1003h ;  dezactive licarire mouse 
 mov bx, 0        
 int 10h
 
@@ -73,12 +70,12 @@ print 1,1,0010_1111b, " mouse not found :-( "
 jmp stop
 
 ok:
-clear_screen
+curatare_ecran
 
 print 7,7,0010_1011b," note: in the emulator you may need to press and hold mouse buttons "
 print 7,8,0010_1011b," because mouse interrupts are not processed in real time.           "
 print 7,9,0010_1011b," for a real test, click external->run from the menu.                "
-print 10,11,0010_1111b," click/hold both buttons to exit... "
+print 13,11,0010_1111b," click/hold both buttons to exit... "
 
 ; display mouse cursor:
 mov ax, 1
@@ -121,10 +118,10 @@ jmp check_mouse_buttons
 
 
 hide:
-mov ax, 2  ; hide mouse cursor.
+mov ax, 2  ; ascunde cursorul mouse-ului
 int 33h
 
-clear_screen
+curatare_ecran
 
 print 1,1,1010_0000b," hardware must be free!      free the mice! "
 
